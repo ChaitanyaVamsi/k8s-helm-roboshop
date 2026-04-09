@@ -2,24 +2,24 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cart
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
 data:
-  REDIS_HOST: "redis"
-  CATALOGUE_HOST: "catalogue" # this is svc
-  CATALOGUE_PORT: "8080"      # this is svc port
+  REDIS_HOST: {{ .Values.configMap.REDIS_HOST | quote }}
+  CATALOGUE_HOST: {{ .Values.configMap.CATALOGUE_HOST | quote }}
+  CATALOGUE_PORT: {{ .Values.configMap.CATALOGUE_PORT | quote }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cart
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
   # these are deployment labels
   labels:
     project: roboshop
     component: cart
     tier: backend
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.replicaCount }}
   selector:
     # Deployment manages pods with this label
     matchLabels:
@@ -36,14 +36,14 @@ spec:
     spec:
       containers:
       - name: cart
-        image: joindevops/cart:v1
-        imagePullPolicy: Always
+        image: "{{ .Values.deployment.imageRepo }}:{{ .Values.deployment.imageVersion }}"
+        imagePullPolicy: {{ .Values.deployment.imagePullPolicy }}
         envFrom:
         - configMapRef:
             name: cart
         ports:
         - name: liveness-port
-          containerPort: 8080
+          containerPort: {{ .Values.service.targetPort }}
         readinessProbe:
           httpGet:
             path: /health
@@ -61,7 +61,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cart
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     project: roboshop
@@ -69,5 +69,5 @@ spec:
     tier: backend
   ports:
     - protocol: TCP
-      port: 8080 # service port
-      targetPort: 8080 # container port
+      port: {{ .Values.service.servicePort }}
+      targetPort: {{ .Values.service.targetPort }}

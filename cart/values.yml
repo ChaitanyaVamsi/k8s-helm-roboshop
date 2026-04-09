@@ -1,0 +1,13 @@
+namespace: roboshop
+deployment:
+  replicaCount: 1
+  imageRepo: joindevops/cart
+  imageVersion: v1
+  imagePullPolicy: Always
+service:
+  servicePort: 8080
+  targetPort: 8080
+configMap:
+  REDIS_HOST: redis
+  CATALOGUE_HOST: catalogue
+  CATALOGUE_PORT: "8080"
