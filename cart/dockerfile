@@ -1,0 +1,20 @@
+FROM node:20.19.5-alpine3.22 AS build
+WORKDIR /opt/server
+COPY package*.json .
+RUN npm install
+COPY . .
+
+FROM node:20.19.5-alpine3.22
+WORKDIR /opt/server
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /opt/server
+COPY --from=build /opt/server .
+USER appuser
+EXPOSE 8080
+# kubectl exec -it <pod> -- env | grep REDIS_HOST
+# ubernetes (and Helm) will override the ENV values defined in your Dockerfile
+ENV REDIS_HOST="redis" \
+  CATALOGUE_HOST="catalogue" \
+  CATALOGUE_PORT="8080"
+CMD [ "node" , "server.js"]
