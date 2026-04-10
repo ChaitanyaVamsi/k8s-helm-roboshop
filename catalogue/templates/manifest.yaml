@@ -2,16 +2,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: catalogue-config
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
 data:
-  MONGO: "true"
-  MONGO_URL: "mongodb://mongodb:27017/catalogue"
+  MONGO: {{ .Values.config.MONGO | quote}}
+  MONGO_URL: {{ .Values.config.MONGO_URL | quote}}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalogue-deploy
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
   labels:
     project: roboshop
     component: catalogue
@@ -66,7 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: catalogue-svc
-  namespace: roboshop
+  namespace: {{ .Values.namespace }}
 spec:
   selector:
     project: roboshop

@@ -1,0 +1,12 @@
+namespace: roboshop
+deployment:
+  replicaCount: 1
+  imageRepo: joindevops/catalogue
+  imageVersion: v1
+  imagePullPolicy: Always
+service:
+  servicePort: 8080
+  targetPort: 8080
+config:
+  MONGO: "true"
+  MONGO_URL: "mongodb://mongodb:27017/catalogue"
